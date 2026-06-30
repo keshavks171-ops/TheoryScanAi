@@ -53,15 +53,21 @@ or a degenerate/junk dimension.
 - Flag gaps: fields with no home, and model columns with no source.
 - **Deliverable:** a source-to-target mapping (extend `04-data-dictionary.md`).
 
-### Phase 2 — Source profiling & staging
-- Identify systems of record (credentialing system, provider master / MDM,
-  network/contracting, quality engine).
-- Profile data quality (NPI completeness, duplicate providers, address quality).
-- Build a `staging` layer that lands raw source extracts.
+### Phase 2 — DWH source profiling & mapping
+- **Source is the existing enterprise DWH** (not raw applications). The DWH
+  already integrates and cleanses data, so the datamart only *selects and shapes*.
+- Identify the DWH tables that hold provider, organization, specialty, network,
+  plan, credentialing, quality, and roster data.
+- Confirm history handling: the DWH **maintains provider history**, so the
+  datamart carries those versioned rows through (SCD2 pass-through) rather than
+  detecting changes itself.
+- Build the source-to-target mapping in `06-source-to-target-mapping.md`.
 
-### Phase 3 — ETL / ELT to the mart
-- Load dimensions first (with SCD Type 2 handling), then facts.
-- Generate surrogate keys, resolve late-arriving dimensions, enforce the grain.
+### Phase 3 — ETL / ELT from the DWH to the mart
+- Load dimensions first, then facts. Generate datamart-owned surrogate keys.
+- For SCD2 dimensions, map the DWH's effective-dated versions straight into the
+  dimension (one surrogate key per version); no change detection required.
+- Resolve late-arriving dimensions, enforce each fact's grain.
 - Tooling options on SQL Server: stored procedures, SSIS, Azure Data Factory,
   or dbt. For a prototype, stored procedures or dbt are the fastest path.
 
@@ -76,7 +82,8 @@ or a degenerate/junk dimension.
 
 ## Conventions used in this prototype
 
-- **Schemas:** `dim`, `fact`, `bridge`, `stg` (staging, reserved for later).
+- **Schemas:** `dim`, `fact`, `bridge` (the datamart). `stg` is reserved for any
+  datamart-local landing/work tables used by the load from the DWH.
 - **Surrogate keys:** `*_SK`, `INT IDENTITY`, the primary key of every dimension.
 - **Business/natural keys:** `*_BK` or named (e.g. `NPI`), carried from source.
 - **SCD Type 2 columns:** `EffectiveDate`, `ExpirationDate`, `IsCurrent`.
