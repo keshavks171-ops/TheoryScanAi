@@ -3,6 +3,12 @@
 Star schema for the Provider datamart. Dimensions surround the fact tables;
 `Bridge_ProviderAffiliation` resolves the provider↔organization many-to-many.
 
+![Provider Datamart ERD](images/provider-datamart-erd.png)
+
+> Rendered image: `docs/images/provider-datamart-erd.png` (also available as
+> `provider-datamart-erd.svg`). Source Mermaid is below — edit it and re-render
+> to update the image.
+
 ```mermaid
 erDiagram
     Dim_Date ||--o{ Fact_ProviderNetworkParticipation : "snapshot date"
