@@ -55,6 +55,7 @@ Source applications ──► Enterprise DWH (integrated, cleansed, history kept
 | `sql/02_facts.sql`                   | Fact table DDL |
 | `sql/03_bridges.sql`                 | Bridge / many-to-many helper tables |
 | `sql/04_constraints_indexes.sql`     | Foreign keys and indexing strategy |
+| `sql/05_sample_data.sql`             | Optional illustrative demo data (fictitious) |
 
 ## The model at a glance
 
@@ -86,10 +87,19 @@ Run the scripts in order against a SQL Server database:
 :r sql/02_facts.sql
 :r sql/03_bridges.sql
 :r sql/04_constraints_indexes.sql
+:r sql/05_sample_data.sql   -- optional: illustrative demo data
 ```
 
 > The scripts are idempotent-friendly (they check for existence before creating).
 > Review `docs/01-methodology-and-roadmap.md` before adapting to your real fields.
+
+`05_sample_data.sql` is **optional**. It generates the `Dim_Date` calendar and
+loads a small set of fictitious providers, organizations, networks, plans, and
+fact rows so the star schema can be queried and connected to Power BI without a
+live DWH feed. Every demo row is tagged `DW_SourceSystem = 'SAMPLE'`, so it is
+easy to remove before a real load (e.g. `DELETE FROM fact.Fact_ProviderRosterSnapshot
+WHERE DW_SourceSystem = 'SAMPLE';`, and likewise for the other `fact.*`,
+`bridge.*`, and `dim.*` tables).
 
 ## Important: this is a starting point, not your final model
 
